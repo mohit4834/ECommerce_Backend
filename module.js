@@ -2,7 +2,6 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const logger = require("morgan");
-const axios = require("axios");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const config = require("./config");
@@ -13,7 +12,6 @@ exports.module = {
   cookieParser: cookieParser,
   path: path,
   logger: logger,
-  axios: axios,
   bodyParser: bodyParser,
   cors: cors,
   config: config,

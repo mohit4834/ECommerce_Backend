@@ -1,26 +1,68 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+require("dotenv").config();
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const mongoose = require("mongoose");
+const mongoConnect = require("connect-mongo");
+const session = require("express-session");
+const Category = require("./models/category");
+var MongoStore = require("connect-mongo");
+const connectDB = require("./config/db");
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
+const app = express();
 
-var app = express();
-
+// mongodb configuration
+connectDB();
 // view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "jade");
-
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
+const dbUrl = process.env.MONGO_URI || "mongodb://localhost/bags-ecommerce";
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: dbUrl,
+      touchAfter: 24 * 3600
+    }),
+    //session expires after 3 hours
+    cookie: { maxAge: 60 * 1000 * 60 * 3 },
+  })
+);
 
+// global variables across routes
+app.use(async (req, res, next) => {
+  try {
+    // res.locals.login = req.isAuthenticated();
+    res.locals.session = req.session;
+    // res.locals.currentUser = req.user;
+    const categories = await Category.find({}).sort({ title: 1 }).exec();
+    res.locals.categories = categories;
+    next();
+  } catch (error) {
+    console.log(error);
+    res.redirect("/");
+  }
+});
+
+
+//routes config
+const indexRouter = require("./routes/index");
+const productsRouter = require("./routes/products");
+// const usersRouter = require("./routes/user");
+// const pagesRouter = require("./routes/pages");
+app.use("/products", productsRouter);
+// app.use("/user", usersRouter);
+// app.use("/pages", pagesRouter);
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -38,35 +80,10 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-const mod = require("./module").module;
-// view engine setup
-app.set("views", mod.path.join(__dirname, "views"));
-app.set("view engine", "ejs");
-app.use(mod.logger("dev"));
-app.use(mod.express.json());
-app.use(mod.express.urlencoded({ extended: false }));
-app.use(mod.cookieParser());
-app.use(mod.express.static(mod.path.join(__dirname, "public")));
-app.use(
-  mod.cors({
-    origin: ["http://localhost:4200"],
-    methods: ["GET", "PUT", "POST", "DELETE"],
-  })
-);
-app.use(
-  mod.cookieSession({
-    name: "sess", //name of the cookie containing access token in the //browser
-    secret: "asdfgh",
-    httpOnly: true,
-  })
-);
-app.use("/oauth", indexRouter);
-// error handler
-app.use(function (err, req, res, next) {
-  res.status(err.status).send();
-});
-app.listen(mod.config.APP_PORT, function () {
-  console.log("app listening on port" + mod.config.APP_PORT);
+var port = process.env.APP_PORT || 3030;
+app.set("port", port);
+app.listen(port, () => {
+  console.log("Server running at port " + port);
 });
 
 module.exports = app;
