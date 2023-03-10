@@ -1,0 +1,89 @@
+apiVersion: "v1"
+kind: "Namespace"
+metadata:
+  name: "cluster-backend-mohitgoyal"
+  labels:
+    name: "cluster-backend-mohitgoyal"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: special-config
+  namespace: cluster-backend-mohitgoyal
+  labels:
+    app: special-config
+data:
+  API_URL: "https://api.spaceXdata.com/v3/launches?limit=100"
+  ENVIRONMENT: "dev"
+  dev_production_flag: "False"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: top-secret
+  namespace: cluster-backend-mohitgoyal
+data:
+  DB_Password: UXdlcnR5QDEyMw==
+  User_ID: Z295YWxtb2hpdDQ4
+type: Opaque
+---
+apiVersion: "apps/v1"
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  namespace: "cluster-backend-mohitgoyal"
+  labels:
+    app: myapp
+spec:
+  template:
+    metadata:
+      name: ecom-backend
+      labels:
+        app: myapp
+        type: back-end
+    spec:
+      containers:
+        - name: myapp
+          image: goyalmohit48/ecommerce-backend
+          imagePullPolicy: Always
+          envFrom:
+          - configMapRef:
+              name: special-config
+          - secretRef:
+              name: top-secret
+          volumeMounts:
+          - name: secrets
+            mountPath: "/etc/secret"
+            readOnly: true
+          - name: configs
+            mountPath: "/etc/config"
+      volumes:
+      - name: secrets
+        secret:
+          secretName: top-secret
+          defaultMode: 0400
+      - name: configs
+        configMap:
+          name: special-config
+  replicas: 4
+  selector:
+    matchLabels:
+      type: back-end
+      app: myapp
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "myapp-deployment-service-backend"
+  namespace: "cluster-backend-mohitgoyal"
+  labels:
+    app: "myapp"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 80
+  selector:
+    app: "myapp"
+    type: "back-end"
+  type: "LoadBalancer"
+  loadBalancerIP: ""
