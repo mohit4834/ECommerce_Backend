@@ -65,7 +65,7 @@ spec:
       - name: configs
         configMap:
           name: special-config
-  replicas: 4
+  replicas: 2
   selector:
     matchLabels:
       type: back-end
