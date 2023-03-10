@@ -17,6 +17,10 @@ router.get("/", async (req, res) => {
 
     const count = await Product.count();
 
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, X-Amz-User-Agent");
+
     console.log("In the products API :",products);
     return res.status(200).json({
       pageName: "All Products",
@@ -52,6 +56,10 @@ router.get("/search", async (req, res) => {
       title: { $regex: req.query.search, $options: "i" },
     });
     console.log('In the search results product count is : ', count, products);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, X-Amz-User-Agent");
+    // res.setHeader("Access-Control-Allow-Credentials", true);
     return res.status(200).json({
       pageName: "Search Results",
       products,
