@@ -30,7 +30,7 @@ tools {
             steps {
                 script {
                     dockerImage = docker.build("goyalmohit48/ecommerce-backend-1")
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
+                    docker.withRegistry('', 'dockerHubCredentials') {
                         dockerImage.push()
                 }
             }
