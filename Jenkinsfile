@@ -9,6 +9,7 @@ environment {
 
 tools {
     nodejs 'nodejs'
+    dockerTool 'dockerMohit'
 }
 
     stages {
@@ -25,6 +26,16 @@ tools {
         //         powershell 'npm run test'
         //     }
         // }
+        stage('Build & Push Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("goyalmohit48/ecommerce-backend-1")
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
+                        dockerImage.push()
+                }
+            }
+        }
+        }
         stage('Kubernetes Deployment') {
             steps{
                 echo "environment variable path ${KUBECONFIG}"
