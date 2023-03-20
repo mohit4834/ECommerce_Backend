@@ -4,8 +4,6 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const mongoose = require("mongoose");
-const mongoConnect = require("connect-mongo");
 const session = require("express-session");
 const Category = require("./models/category");
 var MongoStore = require("connect-mongo");
@@ -16,8 +14,6 @@ const app = express();
 // mongodb configuration
 connectDB();
 // view engine setup
-app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'ejs')
 const dbUrl = process.env.MONGO_URI || "mongodb://localhost/bags-ecommerce";
 app.use(logger("dev"));
 app.use(express.json());
@@ -57,11 +53,7 @@ app.use(async (req, res, next) => {
 //routes config
 const indexRouter = require("./routes/index");
 const productsRouter = require("./routes/products");
-// const usersRouter = require("./routes/user");
-// const pagesRouter = require("./routes/pages");
 app.use("/products", productsRouter);
-// app.use("/user", usersRouter);
-// app.use("/pages", pagesRouter);
 app.use("/", indexRouter);
 
 // catch 404 and forward to error handler
