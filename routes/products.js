@@ -6,13 +6,11 @@ var moment = require("moment");
 
 // GET: display all products
 router.get("/", async (req, res) => {
-  const perPage = 8;
+  const perPage = 38;
   let page = parseInt(req.query.page) || 1;
   try {
     const products = await Product.find({})
       .sort("-createdAt")
-      .skip(perPage * page - perPage)
-      .limit(perPage)
       .populate("category");
 
     const count = await Product.count();
@@ -21,6 +19,7 @@ router.get("/", async (req, res) => {
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, X-Amz-User-Agent");
 
+    console.log("In the products API count of products is :",count);
     console.log("In the products API :",products);
     return res.status(200).json({
       pageName: "All Products",
@@ -44,8 +43,9 @@ router.get("/search", async (req, res) => {
   let page = parseInt(req.query.page) || 1;
   console.log('In the search results product search string value is : ', req.query.search);
   try {
+    let partialToMatch= new RegExp(req.query.search,'i'); 
     const products = await Product.find({
-      title: { $regex: req.query.search, $options: "i" },
+      title: partialToMatch,
     })
       .sort("-createdAt")
       .skip(perPage * page - perPage)
@@ -53,7 +53,7 @@ router.get("/search", async (req, res) => {
       .populate("category")
       .exec();
     const count = await Product.count({
-      title: { $regex: req.query.search, $options: "i" },
+      title: partialToMatch,
     });
     console.log('In the search results product count is : ', count, products);
     res.setHeader("Access-Control-Allow-Origin", "*");

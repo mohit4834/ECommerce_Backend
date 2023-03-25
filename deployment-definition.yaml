@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: goyalmohit48/ecommerce-backend-1
+        image: goyalmohit48/ecommerce-backend-2
         imagePullPolicy: Always
         ports:
         - containerPort: 8081

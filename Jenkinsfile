@@ -4,7 +4,10 @@ agent any
 
 environment {
     scannerHome = tool name: 'Test_Sonar'
-    KUBECONFIG = 'C:/Users/mohitgoyal/.kube/config'
+    KUBECONFIG = '/home/goyalmohit_test1/.kube/config'
+    // KUBECONFIG = 'C:/Users/mohitgoyal/.kube/config'
+    CHROME_BIN='/usr/bin/google-chrome'
+    HOME = '.'
 }
 
 tools {
@@ -29,7 +32,7 @@ tools {
         stage('Build & Push Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("goyalmohit48/ecommerce-backend-1")
+                    dockerImage = docker.build("goyalmohit48/ecommerce-backend-2")
                     docker.withRegistry('', 'dockerHubCredentials') {
                         dockerImage.push()
                 }
