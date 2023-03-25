@@ -18,7 +18,7 @@ tools {
     stages {
         stage('Build') {
             steps {
-				powershell 'npm install'
+				sh 'npm install'
             }
         }
         // stage('Test Case Execution') {
@@ -26,7 +26,7 @@ tools {
         //         branch 'master'
         //     }
         //     steps {
-        //         powershell 'npm run test'
+        //         sh 'npm run test'
         //     }
         // }
         stage('Build & Push Docker Image') {
@@ -43,7 +43,7 @@ tools {
             steps{
                 echo "environment variable path ${KUBECONFIG}"
                 echo "workspace path is ${env.WORKSPACE}"
-                powershell "kubectl --kubeconfig=${KUBECONFIG} apply -f deployment-definition.yaml"
+                sh "kubectl --kubeconfig=${KUBECONFIG} apply -f deployment-definition.yaml"
             }
         }
     }
